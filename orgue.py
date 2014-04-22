@@ -2,8 +2,9 @@
 import math
 from SimpleCV import Image, Color, Display, Camera
 
-imgVelleda = Image('velleda.jpg')
 cam = Camera()
+#imgVelleda = Image('velleda.jpg')
+imgVelleda = cam.getImage()
 imgVelleda = imgVelleda.resize(100, 100)
 
 disp = Display((640, 480))
