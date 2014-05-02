@@ -3,8 +3,9 @@ import math
 from SimpleCV import Image, Camera
 from numpy import argmax, arange
 import socket
+import time
 
-UDP_IP = "127.0.0.1"
+UDP_IP = "192.168.1.60"
 UDP_PORT = 1234
 MESSAGE = "Hello, World!"
 
@@ -13,15 +14,15 @@ print "UDP target port:", UDP_PORT
 
 sock = socket.socket(socket.AF_INET, # Internet
                      socket.SOCK_DGRAM) # UDP
-cam = Camera(0)
-toDisplay = True
-toBroadcast = True
+cam = Camera(0, {"width":320, "height":240})
+toDisplay = False
+toBroadcast = False
 
 
   
 if toBroadcast:
     from SimpleCV import JpegStreamer
-    js = JpegStreamer()
+    js = JpegStreamer("192.168.1.60:8080")
     print "Broadcasting at ", js.url()
     
 class Track:
@@ -41,11 +42,12 @@ if toDisplay:
   disp = Display((640*2, 480))
 while True:
     img = cam.getImage()
+    #img = Image("lenna")
     if toDisplay or toBroadcast:
         imgDisplay = img
-    img.save("box.jpg")
+    #img.save("box.jpg")
     img = img.stretch(80, 140).medianFilter().binarize().gaussianBlur(sigmaX =11, sigmaY=11).stretch(50, 255)
-    
+    print "img"
     track_counter = 0
     for track in tracks:
         track_counter +=1
@@ -61,7 +63,7 @@ while True:
             l = ana.getHorzScanline(i_time)[:,1]
             i_max = argmax(l)
             MESSAGE = str(track_counter) + "," + str(counter) + "," + str(i_max*1.0/ana.width)
-            print MESSAGE
+            #print MESSAGE
             sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
             if i_max!=0:
                 ana.drawCircle((i_max, i_time), 5, color = (255, 0, 0), thickness = -1)
@@ -69,4 +71,4 @@ while True:
         imgDisplay.save(disp)
     if toBroadcast:
         imgDisplay.save(js)
-
+    time.sleep(0.5)
