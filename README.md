@@ -31,6 +31,13 @@ Tester la raspicam
 
 raspistill -t 5000
 
-
+Gestion de la puissance
+Le script power.py doit être lancer au démarrage.
+Il va mettre la pin GPIO 16 à une valeur haute, pour conserver l'alimentation du raspberry.
+Lorsque la batterie devient faible, ou après un timer, un signal est envoyé au raspberry sur la pin 12.
+A ce moment, l'extinction logicielle du pi est lancée. Lorque le pi s'éteint, la ping GPIO 16 retombe à zéro, et l'alimentation peut-être coupée.
+Le lancement du script en service pose problème.
+Il faut du coup utiliser cron
+crontab -e:"sudo python /home/pi/orgie/power.py"
 
 
